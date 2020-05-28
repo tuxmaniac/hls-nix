@@ -1,0 +1,40 @@
+diff --git a/exe/Main.hs b/exe/Main.hs
+index 6a2ec8c..de54da1 100644
+--- a/exe/Main.hs
++++ b/exe/Main.hs
+@@ -33,7 +33,7 @@ import Data.Maybe
+ import qualified Data.Text as T
+ import qualified Data.Text.IO as T
+ import Data.Time.Clock (UTCTime)
+--- import Data.Version
++import Data.Version
+ -- import Development.GitRev
+ import Development.IDE.Core.Debouncer
+ import Development.IDE.Core.FileStore
+@@ -55,7 +55,7 @@ import DynFlags                                 (gopt_set, gopt_unset,
+                                                  updOptLevel)
+ import DynFlags                                 (PackageFlag(..), PackageArg(..))
+ import GHC hiding                               (def)
+-import GHC.Check                                ( VersionCheck(..), makeGhcVersionChecker )
++import GHC.Check                                ( VersionCheck(..), checkGhcVersion )
+ -- import GhcMonad
+ import HIE.Bios.Cradle
+ import HIE.Bios.Environment                     (addCmdOpts, makeDynFlagsAbsolute)
+@@ -388,7 +388,7 @@ loadSession dir = do
+               let hscEnv' = hscEnv { hsc_dflags = df
+                                    , hsc_IC = (hsc_IC hscEnv) { ic_dflags = df } }
+ 
+-              versionMismatch <- checkGhcVersion
++              versionMismatch <- Main.checkGhcVersion
+               henv <- case versionMismatch of
+                         Just mismatch -> return mismatch
+                         Nothing -> newHscEnvEq hscEnv' uids
+@@ -665,7 +665,7 @@ cacheDir :: String
+ cacheDir = "ghcide"
+ 
+ ghcVersionChecker :: IO VersionCheck
+-ghcVersionChecker = $$(makeGhcVersionChecker (pure <$> getLibdir))
++ghcVersionChecker = GHC.Check.checkGhcVersion $ makeVersion [#GHC_VERSION#]
+ 
+ checkGhcVersion :: IO (Maybe HscEnvEq)
+ checkGhcVersion = do
